@@ -1,4 +1,5 @@
 filetype indent on
+filetype plugin on
 
 " line numbers
 set number
