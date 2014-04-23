@@ -1,8 +1,11 @@
-filetype indent on
-filetype plugin on
+filetype plugin indent on
 
 " line numbers
 set number
+
+" file path
+set laststatus=2
+set statusline+=%F
 
 set foldmethod=indent
 set foldnestmax=10
@@ -30,7 +33,9 @@ set ruler
 
 set incsearch
 
+" syntax coloring
 syntax on
+colorscheme blackboard
 
 set wildmenu wildmode=longest:full,full
 
@@ -38,3 +43,6 @@ autocmd BufEnter * silent! lcd %:p:h
 
 " noexpandtab for makefiles
 autocmd FileType make setlocal noexpandtab
+
+" pathogen
+execute pathogen#infect()

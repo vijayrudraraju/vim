@@ -1,0 +1,10 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =8
+let g:netrw_dirhist_1='/Users/vijay/Code/nodemawb'
+let g:netrw_dirhist_2='/Users/vijay/Code/nodemawb/public'
+let g:netrw_dirhist_3='/Users/vijay/Code/nodemawb/scripts'
+let g:netrw_dirhist_4='/Users/vijay/Code/nodemawb'
+let g:netrw_dirhist_5='/Users/vijay/Code/nodemawb/views'
+let g:netrw_dirhist_6='/Users/vijay/Code/nodemawb/public'
+let g:netrw_dirhist_7='/Users/vijay/Code/nodemawb'
+let g:netrw_dirhist_8='/Users/vijay/Code/nodemawb/views'
