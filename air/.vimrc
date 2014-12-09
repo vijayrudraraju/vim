@@ -1,4 +1,5 @@
 filetype plugin indent on
+filetype indent plugin on
 
 " line numbers
 set number
@@ -27,7 +28,7 @@ set expandtab
 
 " copy/paste to system
 vmap <C-c> y:call system("pbcopy", getreg("\""))<CR>
-nmap <C-v> :call setreg("\"", system("pbpaste"))<CR>p
+" nmap <C-v> :call setreg("\"", system("pbpaste"))<CR>p
 
 set ruler
 
