@@ -14,6 +14,7 @@ endif
 
 let g:colors_name = "blackboard"
 
+highlight Pmenu guibg=#84A7C1 ctermbg=238
 if has("gui_running")
   "GUI Colors
   highlight Normal guifg=White   guibg=#0B1022
