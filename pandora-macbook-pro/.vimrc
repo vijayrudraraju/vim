@@ -2,11 +2,42 @@ filetype plugin indent on
 filetype indent plugin on
 
 " line numbers
-set number
+set nonumber
 
-" file path
+" status line file path bar
+function! StatuslineGit()
+  let l:branchname = GitBranch()
+  return strlen(l:branchname) > 0?' '.l:branchname.' ':''
+endfunction
+
+function! CurrentGitStatus()
+  let gitoutput = split(system('git status --porcelain -b '.shellescape(expand('%')).' 2>/dev/null'),'\n')
+  if len(gitoutput) > 0
+    return strpart(get(gitoutput,0,''),3) . '/' . strpart(get(gitoutput,1,'  '),0,2)
+  else
+    return ''
+  endif
+endfunction
+
+set cursorline
+set cursorcolumn
+
 set laststatus=2
-set statusline+=%F
+set statusline=
+set statusline+=%#PmenuSel#
+set statusline+=%{CurrentGitStatus()}
+set statusline+=%#LineNr#
+set statusline+=\ %F
+set statusline+=%m\
+set statusline+=%=
+set statusline+=%#CursorColumn#
+set statusline+=\ %y
+set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
+set statusline+=\[%{&fileformat}\]
+set statusline+=\ %p%%
+set statusline+=\ %l:%c
+set statusline+=\ 
+"set statusline+=\ %l\ %c
 
 set foldmethod=indent
 set foldnestmax=10
@@ -34,8 +65,9 @@ set ruler
 
 set incsearch
 
-" syntax coloring
-syntax on
+" solarized syntax coloring
+syntax enable
+" set background=dark
 colorscheme blackboard
 
 set wildmenu wildmode=longest:full,full
@@ -73,14 +105,22 @@ autocmd FileType make setlocal noexpandtab
 " The Silver Searcher
 if executable('ag')
   " Use ag over grep
-  set grepprg=ag\ --nogroup\ --nocolor
+  set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case
 
   " Use ag CtrlP for listing files. Lightning fast and respects .gitignore
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+  let g:ctrlp_user_command = 'ag %s -l --nocolor --ignore-case --hidden -g ""'
   " ag is fast enough that CtrlP doesn't need to cache
   let g:ctrlp_use_caching = 0
   " set working directory to nearest git directory
   let g:ctrlp_working_path_mode = ''
+  " show hidden files
+  let g:ctrlp_show_hidden = 1
+  let g:ctrlp_dotfiles = 1
+
+  let g:ctrlp_prompt_mappings = {
+      \ 'AcceptSelection("e")': ['<2-LeftMouse>'],
+      \ 'AcceptSelection("t")': ['<cr>'],
+      \ }
 endif
 
 " ctrlp.vim
@@ -93,10 +133,46 @@ nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
 nnoremap F :syntax sync fromstart<CR>
 
 " bind \ (backward slash) to grep shortcut
-command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
+command! -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
 nnoremap \ :Ag<SPACE>
+
+let g:ctrlp_match_window = 'min:4,max:20'
+
+" persistent file undo
+set undodir=~/.vim/undodir
+set undofile
+set undolevels=2000
+set undoreload=20000
+
+" bind leader to ,
+let mapleader = ","
+
+" case insensitive forward slash search
+set ic
+
+" quickfix window, open in new tab, use existing tab if available
+:set switchbuf+=usetab,newtab
+
+" run shell command output to new buffer
+command! -complete=shellcmd -nargs=+ Shell call s:RunShellCommand(<q-args>)
+function! s:RunShellCommand(cmdline)
+  echo a:cmdline
+  let expanded_cmdline = a:cmdline
+  for part in split(a:cmdline, ' ')
+    if part[0] =~ '\v[%#<]'
+      let expanded_part = fnameescape(expand(part))
+      let expanded_cmdline = substitute(expanded_cmdline, part, expanded_part, '')
+    endif
+  endfor
+  :tabnew
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
+  call setline(1, 'You entered:    ' . a:cmdline)
+  call setline(2, 'Expanded Form:  ' .expanded_cmdline)
+  call setline(3,substitute(getline(2),'.','=','g'))
+  execute '$read !'. expanded_cmdline
+  setlocal nomodifiable
+  1
+endfunction
 
 " pathogen
 execute pathogen#infect()
-
-let g:ctrlp_match_window = 'min:4,max:20'
