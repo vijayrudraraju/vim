@@ -11,11 +11,27 @@ function! StatuslineGit()
 endfunction
 
 function! CurrentGitStatus()
-  let gitoutput = split(system('git status --porcelain -b '.shellescape(expand('%')).' 2>/dev/null'),'\n')
+  "let gitoutput = split(system('git status --porcelain -b '.shellescape(expand('%')).' 2>/dev/null'),'\n')
+  let gitoutput = split(system('git status '.shellescape(expand('%')).' 2>/dev/null'),'\n')
   if len(gitoutput) > 0
-    return strpart(get(gitoutput,0,''),3) . '/' . strpart(get(gitoutput,1,'  '),0,2)
+    "return strpart(get(gitoutput,0,''),3) . '/' . strpart(get(gitoutput,1,'  '),0,2)
+    return get(gitoutput,0,'')
   else
     return ''
+  endif
+endfunction
+
+function! Working()
+  let splits = split(getcwd(), '/')
+  return get(splits,len(splits)-1,'')
+endfunction
+
+function! TruncatedName()
+  let splits = split(simplify(expand('%')), '/')
+  if len(splits) > 5
+    return join(splits[1:], '/')
+  else
+    return simplify(expand('%'))
   endif
 endfunction
 
@@ -27,8 +43,10 @@ set statusline=
 set statusline+=%#PmenuSel#
 set statusline+=%{CurrentGitStatus()}
 set statusline+=%#LineNr#
-set statusline+=\ %F
-set statusline+=%m\
+"set statusline+=\ %F
+"set statusline+=\ %{simplify(expand('%'))}
+set statusline+=\ %{TruncatedName()}
+"set statusline+=%m\
 set statusline+=%=
 set statusline+=%#CursorColumn#
 set statusline+=\ %y
@@ -36,6 +54,7 @@ set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
 set statusline+=\[%{&fileformat}\]
 set statusline+=\ %p%%
 set statusline+=\ %l:%c
+set statusline+=\ %{Working()}
 set statusline+=\ 
 "set statusline+=\ %l\ %c
 
@@ -93,7 +112,7 @@ endfunction
 
 " lcd ~/Code/parsegarden
 noremap P :lcd ~/Code/parsegarden<CR>
-noremap A :lcd ~/Code/stagecraft/WebApps/AudioMarket<CR>
+" noremap A :lcd ~/Code/stagecraft/WebApps/AudioMarket<CR>
 noremap D :lcd ~/Code/gitground/freedraw<CR>
 
 " Set working directory to buffer
@@ -116,6 +135,10 @@ if executable('ag')
   " show hidden files
   let g:ctrlp_show_hidden = 1
   let g:ctrlp_dotfiles = 1
+  " ignore during ctrl-p
+  " let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
+  let g:ctrlp_custom_ignore = '\v[\/](node_modules|target|dist)|(\.(swp|ico|git|svn))$'
+
 
   let g:ctrlp_prompt_mappings = {
       \ 'AcceptSelection("e")': ['<2-LeftMouse>'],
@@ -176,3 +199,29 @@ endfunction
 
 " pathogen
 execute pathogen#infect()
+
+" normal backspace
+set backspace=indent,eol,start
+
+" quit quickfix window when closing tab automatically
+aug QFClose
+  au!
+  au WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
+aug END
+
+" easier tab opening
+nnoremap † :tabnew<CR>
+nnoremap ≈ :q<CR>
+
+"autocmd FileType qf nnoremap <buffer> <CR> <CR>:cclose<CR>
+
+" Netrw browser
+let g:netrw_banner = 0
+let g:netrw_liststyle = 1
+let g:netrw_browse_split = 3
+let g:netrw_altv = 1
+let g:netrw_winsize = 25
+"augroup ProjectDrawer
+"  autocmd!
+"  autocmd VimEnter * :Vexplore
+"augroup END
