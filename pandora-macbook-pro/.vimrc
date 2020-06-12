@@ -82,6 +82,7 @@ vmap <C-c> y:call system("pbcopy", getreg("\""))<CR>
 
 set ruler
 
+" incremental search
 set incsearch
 
 " solarized syntax coloring
@@ -94,26 +95,25 @@ set wildmenu wildmode=longest:full,full
 " http://inlehmansterms.net/2014/09/04/sane-vim-working-directories/
 " set working directory to git project root
 " or directory of current file if not git project
-function! SetProjectRoot()
+" function! SetProjectRoot()
   " default to the current file's directory
-  lcd %:p:h
-  let git_dir = system("git rev-parse --show-toplevel")
+  " lcd %:p:h
+  " let git_dir = system("git rev-parse --show-toplevel")
   " See if the command output starts with 'fatal' (if it does, not in a git repo)
-  let is_not_git_dir = matchstr(git_dir, '^fatal:.*')
+  " let is_not_git_dir = matchstr(git_dir, '^fatal:.*')
   " if git project, change local directory to git project root
-  if empty(is_not_git_dir)
-    lcd `=git_dir`
-  endif
-endfunction
+  " if empty(is_not_git_dir)
+    " lcd `=git_dir`
+  " endif
+" endfunction
 
 " Set working dir to git root
 " autocmd BufEnter *
 "  \ call SetProjectRoot()
 
-" lcd ~/Code/parsegarden
-noremap P :lcd ~/Code/parsegarden<CR>
+" noremap P :lcd ~/Code/parsegarden<CR>
 " noremap A :lcd ~/Code/stagecraft/WebApps/AudioMarket<CR>
-noremap D :lcd ~/Code/gitground/freedraw<CR>
+" noremap D :lcd ~/Code/gitground/freedraw<CR>
 
 " Set working directory to buffer
 " autocmd BufEnter * silent! lcd %:p:h
@@ -127,23 +127,27 @@ if executable('ag')
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case
 
   " Use ag CtrlP for listing files. Lightning fast and respects .gitignore
-  let g:ctrlp_user_command = 'ag %s -l --nocolor --ignore-case --hidden -g ""'
+  let g:ctrlp_user_command = 'ag %s -l --nocolor --ignore-case --hidden -g ~/Code/web-client-devel'
+
   " ag is fast enough that CtrlP doesn't need to cache
   let g:ctrlp_use_caching = 0
+
   " set working directory to nearest git directory
-  let g:ctrlp_working_path_mode = ''
+  " let g:ctrlp_working_path_mode = 'ra'
+  "
   " show hidden files
   let g:ctrlp_show_hidden = 1
   let g:ctrlp_dotfiles = 1
+
   " ignore during ctrl-p
   " let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
   let g:ctrlp_custom_ignore = '\v[\/](node_modules|target|dist)|(\.(swp|ico|git|svn))$'
-
 
   let g:ctrlp_prompt_mappings = {
       \ 'AcceptSelection("e")': ['<2-LeftMouse>'],
       \ 'AcceptSelection("t")': ['<cr>'],
       \ }
+  let g:ctrlp_cmd = 'CtrlP'
 endif
 
 " ctrlp.vim
